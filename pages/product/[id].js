@@ -2,8 +2,8 @@ import fetch from 'isomorphic-unfetch';
 
 const Product = props => (
   <div>
-    <h1>{props.data.name}</h1>
-    <p>{props.data.price}</p>
+    <h1>商品名稱: {props.data.name}</h1>
+    <p>單價: {props.data.price}</p>
   </div>
 );
 

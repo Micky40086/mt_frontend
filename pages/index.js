@@ -1,74 +1,77 @@
-import React from 'react'
+import React, { useCookies } from 'react'
 import Link from 'next/link';
 import fetch from 'isomorphic-unfetch'
+import Cookies from 'js-cookie'
 
-const Home = (props) => (
-  <div>
-    <h1>商品列表</h1>
+const Home = (props) => {
+  const setFooCookie = (id) => {
+    const currentCarCookies = Cookies.get("car")
+    let newCarCookies = currentCarCookies != "undefined" ? JSON.parse(currentCarCookies) : {}
+    
+    if (newCarCookies[id]) {
+      newCarCookies[id] += 1
+    } else {
+      newCarCookies[id] = 1
+    }
 
-    <div className='hero'>
-      <div className='row'>
-        {props.products.map(product => (
-          <Link key={product.id} href="/product/[id]" as={`/product/${product.id}`}>
-            <a className='card'>
-              <h3>{product.name}</h3>
-              <p>{product.price}</p>
-            </a>
-          </Link>
-        ))}
+    Cookies.set("car", JSON.stringify(newCarCookies))
+  }
+  
+  return (
+    <div>
+      <div className="header">
+        <h1>商品列表</h1>
+        <Link href="/cart">
+          <a>前往購物車</a>
+        </Link>
+      </div>    
+      <div className='container'>
+        <div className='row'>
+          {props.products.map(product => (
+            <div key={product.id} className='card'>
+              <Link href="/product/[id]" as={`/product/${product.id}`}>
+                <a>
+                  <h3>{product.name}</h3>
+                </a>
+              </Link>
+              <p>價格: {product.price}</p>
+              <button className="carBtn" onClick={() => setFooCookie(product.id.toString())}>加到購物車</button>
+            </div>
+          ))}
+        </div>
       </div>
+
+      <style jsx>{`
+        .header {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0 50px;
+        }
+        .container {
+          padding: 0 50px;
+        }
+        .container .row {
+          display: flex;
+          justify-content: space-around;
+        }
+        .container .card {
+          display: flex;
+          flex-direction: column;
+          justify-content: center;
+          border: 1px solid black;
+          padding: 10px 20px;
+        }
+        .container .carBtn {
+          display: block;
+          margin: 1em 0;
+        }
+      `}</style>
     </div>
+  )
+}
 
-    <style jsx>{`
-      .hero {
-        width: 100%;
-        color: #333;
-      }
-      .title {
-        margin: 0;
-        width: 100%;
-        padding-top: 80px;
-        line-height: 1.15;
-        font-size: 48px;
-      }
-      .title,
-      .description {
-        text-align: center;
-      }
-      .row {
-        max-width: 880px;
-        margin: 80px auto 40px;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-      }
-      .card {
-        padding: 18px 18px 24px;
-        width: 220px;
-        text-align: left;
-        text-decoration: none;
-        color: #434343;
-        border: 1px solid #9b9b9b;
-      }
-      .card:hover {
-        border-color: #067df7;
-      }
-      .card h3 {
-        margin: 0;
-        color: #067df7;
-        font-size: 18px;
-      }
-      .card p {
-        margin: 0;
-        padding: 12px 0 0;
-        font-size: 13px;
-        color: #333;
-      }
-    `}</style>
-  </div>
-)
-
-Home.getInitialProps = async function() {
+Home.getInitialProps = async function(ctx) {
   const res = await fetch('http://localhost:3000/products');
   const data = await res.json();
 
