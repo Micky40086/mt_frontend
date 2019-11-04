@@ -1,47 +1,28 @@
 import React, { useState, useEffect } from 'react'
-import Router from 'next/router'
-
+import { useRouter } from 'next/router'
+import Link from 'next/link';
 import fetch from 'isomorphic-unfetch'
-import Cookies from 'js-cookie'
 
-const Cart = (props) => {
+const Order = (props) => {
+  const router = useRouter()
   const [productKeys, setProductKeys] = useState([])
   const [productValues, setProductValues] = useState([])
 
   useEffect(() => {
-    let currentCarCookies = Cookies.get("car")
-    currentCarCookies = currentCarCookies ? JSON.parse(currentCarCookies) : {}
-    setProductKeys(Object.keys(currentCarCookies))
-    setProductValues(Object.values(currentCarCookies))
+    let products = router.query.products
+    products = products ? JSON.parse(products) : {}
+    setProductKeys(Object.keys(products))
+    setProductValues(Object.values(products))
     return () => {}
   }, [])
 
-  const changeProductValues = (value, index) => {
-    let tmpArr = [...productValues]
-    tmpArr.splice(index, 1, value)
-    setProductValues(tmpArr)
-  }
-
-  const submitForm = () => {
-    if (productValues.find(item => item < 0)) {
-      alert("商品數量必須大於0")
-      return
-    }
-
-    const products = {}
-    productKeys.forEach((item, index) => {
-      products[item] = productValues[index]
-    })
-
-    Router.push({
-      pathname: '/order',
-      query: { products: JSON.stringify(products) }
-    })
+  const productsPriceSum = () => {
+    let sum = 0
   }
   
   return (
     <div>
-      <h1>購物車</h1>
+      <h1>訂單確認頁</h1>
 
       <div className="container">
         <div className="itemGroup">
@@ -50,20 +31,23 @@ const Cart = (props) => {
           <div>價格</div>
           <div>總價</div>
         </div>
+        <form>
         {productKeys.map((item, index) => {
           const currentProduct = props.products.find(product => item === product.id.toString())
           return (
             <div key={currentProduct.id} className="itemGroup">
               <div>{currentProduct.name}</div>
-              <div>
-                <input value={productValues[index]} onChange={(e) => changeProductValues(parseInt(e.target.value || 0), index)}/>
-              </div>
+              <div>{productValues[index]}</div>
               <div>{currentProduct.price}</div>
-              <div>{currentProduct.price * productValues[index]}</div>
+              <div className="itemSum">{currentProduct.price * productValues[index]}</div>
             </div>
           )}
         )}
-        <button className="submitBtn" onClick={() => submitForm()}>Order Page</button>
+        <p>合計: </p>
+        </form>
+        {/* <Link href="/order">
+          <a className="submitBtn">Create Order</a>
+        </Link> */}
       </div>
       <style jsx>{`
         .container {
@@ -88,7 +72,7 @@ const Cart = (props) => {
   )
 }
 
-Cart.getInitialProps = async function() {
+Order.getInitialProps = async function() {
   const res = await fetch('http://localhost:3000/products');
   const data = await res.json();
 
@@ -97,4 +81,4 @@ Cart.getInitialProps = async function() {
   }
 };
 
-export default Cart
+export default Order
