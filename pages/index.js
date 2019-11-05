@@ -4,9 +4,9 @@ import fetch from 'isomorphic-unfetch'
 import Cookies from 'js-cookie'
 
 const Home = (props) => {
-  const setFooCookie = (id) => {
+  const setCarCookie = (id) => {
     const currentCarCookies = Cookies.get("car")
-    let newCarCookies = currentCarCookies != "undefined" ? JSON.parse(currentCarCookies) : {}
+    let newCarCookies = currentCarCookies ? JSON.parse(currentCarCookies) : {}
     
     if (newCarCookies[id]) {
       newCarCookies[id] += 1
@@ -35,7 +35,7 @@ const Home = (props) => {
                 </a>
               </Link>
               <p>價格: {product.price}</p>
-              <button className="carBtn" onClick={() => setFooCookie(product.id.toString())}>加到購物車</button>
+              <button className="carBtn" onClick={() => setCarCookie(product.id.toString())}>加到購物車</button>
             </div>
           ))}
         </div>

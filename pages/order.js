@@ -7,6 +7,7 @@ const Order = (props) => {
   const router = useRouter()
   const [productKeys, setProductKeys] = useState([])
   const [productValues, setProductValues] = useState([])
+  const [sum, setSum] = useState(0)
 
   useEffect(() => {
     let products = router.query.products
@@ -16,9 +17,17 @@ const Order = (props) => {
     return () => {}
   }, [])
 
-  const productsPriceSum = () => {
-    let sum = 0
-  }
+  useEffect(() => {
+    if (productKeys.length > 0) {
+      let tmpSum = 0
+      productKeys.forEach((item, index) => {
+        const tmpProduct = props.products.find(product => item === product.id.toString())
+        tmpSum += tmpProduct.price * productValues[index]
+      })
+      setSum(tmpSum)
+    }
+    return () => {}
+  }, [productKeys])
   
   return (
     <div>
@@ -43,11 +52,8 @@ const Order = (props) => {
             </div>
           )}
         )}
-        <p>合計: </p>
+        <p className="sumText">合計: {sum}</p>
         </form>
-        {/* <Link href="/order">
-          <a className="submitBtn">Create Order</a>
-        </Link> */}
       </div>
       <style jsx>{`
         .container {
@@ -65,6 +71,9 @@ const Order = (props) => {
           color: white;
           float: right;
           text-decoration: none;
+        }
+        .sumText {
+          text-align: right;
         }
       `}</style>
     </div>
