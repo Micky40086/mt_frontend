@@ -5,7 +5,7 @@
   "scripts": {
     "dev": "next dev -p",
     "build": "next build",
-    "start": "next start"
+    "start": "next start -p"
   },
   "dependencies": {
     "isomorphic-unfetch": "^3.0.0",
