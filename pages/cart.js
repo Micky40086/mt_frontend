@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react'
 import Router from 'next/router'
-
 import fetch from 'isomorphic-unfetch'
 import Cookies from 'js-cookie'
 
@@ -80,7 +79,6 @@ const Cart = (props) => {
           padding: 5px 10px;
           color: white;
           float: right;
-          text-decoration: none;
         }
       `}</style>
     </div>

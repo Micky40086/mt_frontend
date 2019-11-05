@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react'
 import { useRouter } from 'next/router'
-import Link from 'next/link';
+import Router from 'next/router'
 import fetch from 'isomorphic-unfetch'
+import Cookies from 'js-cookie'
 
 const Order = (props) => {
   const router = useRouter()
@@ -28,6 +29,27 @@ const Order = (props) => {
     }
     return () => {}
   }, [productKeys])
+
+  const callCreateOrderApi = async () => {
+    const res = await fetch('http://localhost:3000/orders', {
+      method: 'post',
+      body:    JSON.stringify({order: {}, products: router.query.products}),
+      headers: { 'Content-Type': 'application/json' },
+    })
+
+    if (res.status === 201) {
+      const resJson = await res.json()
+
+      Router.push({
+        pathname: '/finish',
+        query: { orderId: resJson.uid }
+      })
+
+      Cookies.set("car", "")
+    } else {
+      alert("新增訂單失敗")
+    }
+  }
   
   return (
     <div>
@@ -54,6 +76,7 @@ const Order = (props) => {
         )}
         <p className="sumText">合計: {sum}</p>
         </form>
+        <button className="submitBtn" onClick={() => callCreateOrderApi()}>Create Order</button>
       </div>
       <style jsx>{`
         .container {
@@ -74,6 +97,12 @@ const Order = (props) => {
         }
         .sumText {
           text-align: right;
+        }
+        .submitBtn {
+          background-color: green;
+          padding: 5px 10px;
+          color: white;
+          float: right;
         }
       `}</style>
     </div>
